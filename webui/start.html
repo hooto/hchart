@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript" src="/~/js/sea.min.js"></script>
+  <script type="text/javascript" src="/~/chart.js"></script>
+</head>
+
+<body>
+
+<h2>Bar 1</h2>
+<pre id="start-bar-1">
+{
+  "type": "bar",
+  "options": {
+    "width": "500px",
+    "height": "200px"
+  },
+  "data": {
+    "labels": ["January", "February", "March", "April", "May", "June", "July"],
+    "datasets": [{
+      "label": "Label 1",
+      "data": [50, 55, 50, 55, 50, 55, 40]
+    }, {
+      "label": "Label 1",
+      "data": [50, 55, 50, 55, 50, 55, 40]
+    }, {
+      "label": "Label 1",
+      "data": [50, 55, 50, 55, 50, 55, 40]
+    }, {
+      "label": "Label 1",
+      "data": [50, 55, 50, 55, 50, 55, 40]
+    }, {
+      "label": "Label 2",
+      "data": [49, 50, 55, 40, 50, 40, 55]
+    }]
+  }
+}
+</pre>
+<script type="text/javascript">
+hooto_chart.JsonRenderElementID("start-bar-1");
+</script>
+
+
+
+<h2>Bar H</h2>
+<pre id="start-bar-2">
+{
+  "type": "bar-h",
+  "options": {
+    "width": "500px",
+    "height": "200px"
+  },
+  "data": {
+    "labels": ["January", "February", "March", "April", "May", "June", "July"],
+    "datasets": [{
+      "label": "Label 1",
+      "data": [49, 50, 55, 40, 50, 40, 55]
+    }]
+  }
+}
+</pre>
+<script type="text/javascript">
+hooto_chart.JsonRenderElementID("start-bar-2");
+</script>
+
+
+<h2>Line</h2>
+<pre id="start-line-1">
+{
+  "type": "line",
+  "options": {
+    "width": "500px",
+    "height": "200px"
+  },
+  "data": {
+    "labels": ["January", "February", "March", "April", "May", "June", "July"],
+    "datasets": [{
+      "label": "Label 1",
+      "data": [50, 55, 50, 55, 50, 55, 40]
+    }, {
+      "label": "Label 2",
+      "data": [49, 50, 55, 40, 50, 40, 55]
+    }]
+  }
+}
+</pre>
+<script type="text/javascript">
+hooto_chart.JsonRenderElementID("start-line-1");
+</script>
+
+
+<h2>Pie</h2>
+<pre id="start-pie-1">
+{
+  "type": "pie",
+  "options": {
+    "width": "500px",
+    "height": "200px"
+  },
+  "data": {
+    "labels": ["January", "February", "March", "April", "May", "June", "July"],
+    "datasets": [{
+      "data": [50, 55, 50, 55, 50, 55, 40]
+    }]
+  }
+}
+</pre>
+<script type="text/javascript">
+hooto_chart.JsonRenderElementID("start-pie-1");
+</script>
+
+</body>
+</html>
+

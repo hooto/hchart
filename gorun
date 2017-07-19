@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm -f ./bin/hooto-chart
+
+go build -ldflags "-w -s" -o ./bin/hooto-chart ./main.go
+
+./bin/hooto-chart -logtostderr=true 
+
