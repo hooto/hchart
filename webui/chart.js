@@ -8,6 +8,8 @@ if (global.hooto_chart) {
 var chart = global.hooto_chart = {
     version: "0.1.0.dev",
     basepath: "/chart/~",
+    opts_width: "800px",
+    opts_height: "600px",
 }
 
 var color = {
@@ -85,10 +87,10 @@ chart.JsonRenderElement = function(elem, elem_id)
     entry.options.elements = entry.options.elements || {};
 
 	if (!entry.options.width) {
-		entry.options.width = "100%";
+		entry.options.width = chart.opts_width;
 	}
 	if (!entry.options.height) {
-		entry.options.height = "600";
+		entry.options.height = chart.opts_height;
 	}
 
     entry.options.animation = {
@@ -214,6 +216,7 @@ chart.jsr_general = function(data)
         if (data.options.height) {
             elem_d.style.height = data.options.height;
         }
+        elem_d.setAttribute("class", "hooto-chart-entry");
         elem_d.appendChild(elem_c);
 
         data.elem.insertAdjacentHTML("afterEnd", elem_d.outerHTML);
