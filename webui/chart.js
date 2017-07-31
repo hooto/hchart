@@ -78,8 +78,22 @@
         }
 
         entry.options = entry.options || {};
+        entry.options.legend = entry.options.legend || {};
         entry.options.scales = entry.options.scales || {};
         entry.options.elements = entry.options.elements || {};
+
+        if (entry.options.title && typeof entry.options.title === 'string') {
+            entry.options.title = {
+                text: entry.options.title,
+                display: true
+            }
+        }
+
+        if (entry.options.legend.display === undefined) {
+            entry.options.legend.display = true;
+        } else {
+            entry.options.legend.display = false;
+        }
 
         if (!entry.options.width) {
             entry.options.width = chart.opts_width;
@@ -143,6 +157,11 @@
             entry.data.datasets[i].backgroundColor = color.rgb(clr, 1);
             entry.data.datasets[i].fill = false;
         }
+        if (entry.data.datasets.length == 1 && entry.options.title) {
+            entry.options.legend.display = false;
+        } else if (entry.options.legend.position === undefined) {
+            entry.options.legend.position = "bottom";
+        }
         chart.jsr_general(entry);
     }
 
@@ -159,12 +178,22 @@
             entry.type = "horizontalBar";
         }
 
+        if (entry.data.datasets.length == 1 && entry.options.title) {
+            entry.options.legend.display = false;
+        } else if (entry.options.legend.position === undefined) {
+            entry.options.legend.position = "bottom";
+        }
+
         var cp = new color_pallet();
         for (var i in entry.data.datasets) {
             var clr = cp.rand();
             entry.data.datasets[i].stack = "stack-" + i;
             entry.data.datasets[i].borderColor = color.rgb(clr, 0.95);
             entry.data.datasets[i].backgroundColor = color.rgb(clr, 0.95);
+        }
+
+        if (entry.data.datasets.length == 1 && entry.options.title) {
+            entry.options.legend.display = false;
         }
 
         chart.jsr_general(entry);
@@ -174,6 +203,10 @@
         entry.options.scales.xAxes = {};
         entry.options.scales.yAxes = {};
         entry.options.cutoutPercentage = 50;
+
+        if (entry.options.legend.position === undefined) {
+            entry.options.legend.position = "right";
+        }
 
         for (var i in entry.data.datasets) {
             var cs = [];
