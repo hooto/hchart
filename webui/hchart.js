@@ -1,3 +1,17 @@
+// Copyright 2017 The hchart Authors, All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 (function(global, undefined) {
     'use strict';
 
@@ -5,9 +19,9 @@
         return;
     }
 
-    var chart = global.hooto_chart = {
+    var hc = global.hooto_chart = {
         version: "0.1.0.dev",
-        basepath: "/chart/~",
+        basepath: "/hchart/~",
         opts_width: "800px",
         opts_height: "600px",
     }
@@ -53,21 +67,21 @@
         return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
     }
 
-    chart.deps_load = function(cb) {
+    hc.deps_load = function(cb) {
         seajs.use([
-            chart.basepath + "/chartjs/chart.js",
+            hc.basepath + "/chartjs/chart.js",
         ], cb);
     }
 
-    chart.JsonRenderElementID = function(elem_id) {
+    hc.JsonRenderElementID = function(elem_id) {
         var elem = document.getElementById(elem_id);
         if (!elem) {
             return;
         }
-        chart.JsonRenderElement(elem, elem_id);
+        hc.JsonRenderElement(elem, elem_id);
     }
 
-    chart.JsonRenderElement = function(elem, elem_id) {
+    hc.JsonRenderElement = function(elem, elem_id) {
         var entry = JSON.parse(elem.innerHTML);
         if (!entry || !entry.type) {
             return;
@@ -96,10 +110,10 @@
         }
 
         if (!entry.options.width) {
-            entry.options.width = chart.opts_width;
+            entry.options.width = hc.opts_width;
         }
         if (!entry.options.height) {
-            entry.options.height = chart.opts_height;
+            entry.options.height = hc.opts_height;
         }
 
         entry.options.animation = {
@@ -135,18 +149,18 @@
         switch (entry.type) {
             case "bar-h":
             case "bar":
-                chart.jsr_bar(entry);
+                hc.jsr_bar(entry);
                 break;
             case "line":
-                chart.jsr_line(entry);
+                hc.jsr_line(entry);
                 break;
             case "pie":
-                chart.jsr_pie(entry);
+                hc.jsr_pie(entry);
                 break;
         }
     }
 
-    chart.jsr_line = function(entry) {
+    hc.jsr_line = function(entry) {
         entry.options.scales.xAxes[0].gridLines = {
             display: false,
         };
@@ -162,10 +176,10 @@
         } else if (entry.options.legend.position === undefined) {
             entry.options.legend.position = "bottom";
         }
-        chart.jsr_general(entry);
+        hc.jsr_general(entry);
     }
 
-    chart.jsr_bar = function(entry) {
+    hc.jsr_bar = function(entry) {
         if (entry.type == "bar") {
             entry.options.scales.xAxes[0].gridLines = {
                 display: false,
@@ -196,10 +210,10 @@
             entry.options.legend.display = false;
         }
 
-        chart.jsr_general(entry);
+        hc.jsr_general(entry);
     }
 
-    chart.jsr_pie = function(entry) {
+    hc.jsr_pie = function(entry) {
         entry.options.scales.xAxes = {};
         entry.options.scales.yAxes = {};
         entry.options.cutoutPercentage = 50;
@@ -217,14 +231,14 @@
             }
             entry.data.datasets[i].backgroundColor = cs;
         }
-        chart.jsr_general(entry);
+        hc.jsr_general(entry);
     }
 
-    chart.jsr_general = function(data) {
-        chart.deps_load(function() {
+    hc.jsr_general = function(data) {
+        hc.deps_load(function() {
 
             var elem_c = document.createElement("canvas");
-            elem_c.id = data.elem_id + "-chart";
+            elem_c.id = data.elem_id + "-hchart";
             if (data.options.width) {
                 elem_c.width = "100vw";
             }
@@ -245,7 +259,7 @@
             data.elem.insertAdjacentHTML("afterEnd", elem_d.outerHTML);
             data.elem.style.display = "none";
 
-            var ctx = document.getElementById(data.elem_id + "-chart").getContext("2d");
+            var ctx = document.getElementById(data.elem_id + "-hchart").getContext("2d");
             new Chart(ctx, data);
         });
     }
