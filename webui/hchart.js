@@ -83,6 +83,13 @@
 
     hc.JsonRenderElement = function(elem, elem_id) {
         var entry = JSON.parse(elem.innerHTML);
+        if (!entry) {
+            return;
+        }
+        return hc.RenderElement(entry, elem_id);
+    }
+
+    hc.RenderElement = function(entry, elem_id) {
         if (!entry || !entry.type) {
             return;
         }
@@ -109,9 +116,9 @@
             entry.options.legend.display = false;
         }
 
-        if (!entry.options.width) {
-            entry.options.width = hc.opts_width;
-        }
+        // if (!entry.options.width) {
+        //     entry.options.width = hc.opts_width;
+        // }
         if (!entry.options.height) {
             entry.options.height = hc.opts_height;
         }
@@ -143,7 +150,6 @@
             };
         }
 
-        entry.elem = elem;
         entry.elem_id = elem_id;
 
         switch (entry.type) {
@@ -256,8 +262,15 @@
             elem_d.setAttribute("class", "hooto-chart-entry");
             elem_d.appendChild(elem_c);
 
-            data.elem.insertAdjacentHTML("afterEnd", elem_d.outerHTML);
-            data.elem.style.display = "none";
+            if (data.elem) {
+                data.elem.insertAdjacentHTML("afterEnd", elem_d.outerHTML);
+                data.elem.style.display = "none";
+            } else {
+                var elem = document.getElementById(data.elem_id);
+                if (elem) {
+                    elem.innerHTML = elem_d.outerHTML;
+                }
+            }
 
             var ctx = document.getElementById(data.elem_id + "-hchart").getContext("2d");
             new Chart(ctx, data);
