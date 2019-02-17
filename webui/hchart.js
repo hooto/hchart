@@ -106,7 +106,8 @@
         if (entry.options.title && typeof entry.options.title === 'string') {
             entry.options.title = {
                 text: entry.options.title,
-                display: true
+                display: true,
+                fontSize: 16
             }
         }
 
@@ -243,6 +244,7 @@
     hc.jsr_general = function(data) {
         hc.deps_load(function() {
 
+		    // Chart.defaults.global.title.fontSize = 16;
             var elem_c = document.createElement("canvas");
             elem_c.id = data.elem_id + "-hchart";
             if (data.options.width) {

@@ -15,7 +15,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"runtime"
@@ -25,18 +24,11 @@ import (
 	"github.com/hooto/httpsrv"
 )
 
-var (
-	flagPrefix = flag.String("prefix", "", "the prefix folder path")
-)
-
-func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-}
-
 func main() {
 
-	flag.Parse()
-	if err := conf.Initialize(*flagPrefix); err != nil {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	if err := conf.Initialize(); err != nil {
 		hlog.Printf("error", "conf.Initialize error: %v", err)
 		os.Exit(1)
 	}
