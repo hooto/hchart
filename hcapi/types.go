@@ -1,4 +1,4 @@
-// Copyright 2017 The hchart Authors, All rights reserved.
+// Copyright 2020 Eryx <evorui аt gmail dοt com>, All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import (
 )
 
 var (
-	chart_ls_mu       sync.RWMutex
-	chart_datasets_mu sync.RWMutex
+	listMu    sync.RWMutex
+	datasetMu sync.RWMutex
 )
 
 const (
@@ -28,13 +28,8 @@ const (
 	ChartTypeBarHorizontal = "bar-h"
 	ChartTypeLine          = "line"
 	ChartTypePie           = "pie"
+	ChartTypeHistogram     = "histogram"
 )
-
-type ChartOptions struct {
-	Title  string `json:"title,omitempty"`
-	Width  string `json:"width,omitempty"`
-	Height string `json:"height,omitempty"`
-}
 
 type ChartEntry struct {
 	Type    string       `json:"type"`
@@ -42,52 +37,123 @@ type ChartEntry struct {
 	Data    ChartData    `json:"data"`
 }
 
+type ChartOptions struct {
+	Title  string      `json:"title,omitempty"`
+	Width  string      `json:"width,omitempty"`
+	Height string      `json:"height,omitempty"`
+	X      AxisOptions `json:"x,omitempty"`
+	Y      AxisOptions `json:"y,omitempty"`
+}
+
+type AxisOptions struct {
+	Title string `json:"title,omitempty"`
+}
+
+func (it *ChartOptions) WidthLength() float64 {
+	return 800
+}
+
+func (it *ChartOptions) HeightLength() float64 {
+	return 400
+}
+
+type ChartPoint struct {
+	X float64 `json:"x,omitempty"`
+	Y float64 `json:"y,omitempty"`
+}
+
 type ChartData struct {
-	Labels   []string       `json:"labels,omitempty"`
-	Datasets []ChartDataset `json:"datasets,omitempty"`
+	Labels   []string        `json:"labels,omitempty"`
+	Datasets []*ChartDataset `json:"datasets,omitempty"`
 }
 
 type ChartDataset struct {
-	Label string  `json:"label,omitempty"`
-	Data  []int64 `json:"data,omitempty"`
+	Label  string        `json:"label,omitempty"`
+	Data   []int64       `json:"data,omitempty"`
+	Points []*ChartPoint `json:"points,omitempty"`
+	Values []float64     `json:"values,omitempty"`
 }
 
-func (it *ChartData) Sync(d_label, ds_label string, ds_data int64) {
+func (it *ChartEntry) Valid() error {
+	return nil
+}
 
-	chart_datasets_mu.Lock()
-	defer chart_datasets_mu.Unlock()
+func (it *ChartData) Sync(legendLabel, dsLabel string, dsData int64) {
+
+	datasetMu.Lock()
+	defer datasetMu.Unlock()
 
 	for k, v := range it.Datasets {
-		if v.Label == ds_label {
-			it.Datasets[k].Data = append(v.Data, ds_data)
+		if v.Label == legendLabel {
+			it.Datasets[k].Data = append(v.Data, dsData)
 			if len(it.Datasets[k].Data) > len(it.Labels) {
-				it.Labels = append(it.Labels, d_label)
+				it.Labels = append(it.Labels, dsLabel)
 			}
 			return
 		}
 	}
 
-	it.Datasets = append(it.Datasets, ChartDataset{
-		Label: ds_label,
-		Data:  []int64{ds_data},
+	it.Datasets = append(it.Datasets, &ChartDataset{
+		Label: legendLabel,
+		Data:  []int64{dsData},
 	})
 	if len(it.Labels) < 1 {
-		it.Labels = append(it.Labels, d_label)
+		it.Labels = append(it.Labels, legendLabel)
 	}
+}
+
+func (it *ChartEntry) Dataset(legendLabel string) *ChartDataset {
+
+	datasetMu.Lock()
+	defer datasetMu.Unlock()
+
+	for _, v := range it.Data.Datasets {
+
+		if v.Label == legendLabel {
+			v.Values = []float64{}
+			v.Points = []*ChartPoint{}
+			return v
+		}
+	}
+	v := &ChartDataset{
+		Label: legendLabel,
+	}
+	it.Data.Datasets = append(it.Data.Datasets, v)
+	return v
+}
+
+func (it *ChartDataset) PointSet(x, y float64) {
+	it.Point(x).Y = y
+}
+
+func (it *ChartDataset) Point(x float64) *ChartPoint {
+
+	for _, v := range it.Points {
+		if v.X == x {
+			return v
+		}
+	}
+
+	p := &ChartPoint{
+		X: x,
+	}
+
+	it.Points = append(it.Points, p)
+	return p
 }
 
 type ChartList struct {
 	Items []ChartEntry `json:"items"`
 }
 
-func (it *ChartList) Sync(c_type, c_title, d_label, ds_label string, ds_data int64) {
+func (it *ChartList) Sync(c_type, c_title, legendLabel, dsLabel string, dsData int64) {
 
-	chart_ls_mu.Lock()
-	defer chart_ls_mu.Unlock()
+	listMu.Lock()
+	defer listMu.Unlock()
 
 	for k, v := range it.Items {
 		if v.Type == c_type && v.Options.Title == c_title {
-			it.Items[k].Data.Sync(d_label, ds_label, ds_data)
+			it.Items[k].Data.Sync(legendLabel, dsLabel, dsData)
 			return
 		}
 	}
@@ -98,13 +164,17 @@ func (it *ChartList) Sync(c_type, c_title, d_label, ds_label string, ds_data int
 			Title: c_title,
 		},
 		Data: ChartData{
-			Labels: []string{d_label},
-			Datasets: []ChartDataset{
+			Labels: []string{legendLabel},
+			Datasets: []*ChartDataset{
 				{
-					Label: ds_label,
-					Data:  []int64{ds_data},
+					Label: dsLabel,
+					Data:  []int64{dsData},
 				},
 			},
 		},
 	})
+}
+
+type ChartRenderOptions struct {
+	Name string `json:"name"`
 }
