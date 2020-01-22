@@ -1,0 +1,151 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "7uVVd/pLf/cnSoyyFDQzAB/fXIc=",
+			"path": "gonum.org/v1/gonum/blas",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "HCb6HBvMJb8h3i2xdmYFXkT0C3A=",
+			"path": "gonum.org/v1/gonum/blas/blas64",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "6No2OLsifZGPuO1rsJG7G5T82H4=",
+			"path": "gonum.org/v1/gonum/blas/gonum",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "cm3+4+5K0jp1qbMwXPaCic/sBEk=",
+			"path": "gonum.org/v1/gonum/floats",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "+NFd4Y8t2G+vZIrE07vLHhzgkuA=",
+			"path": "gonum.org/v1/gonum/internal/asm/c128",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "kfUgTWp1oIiWzGYDFegQvOtW80A=",
+			"path": "gonum.org/v1/gonum/internal/asm/f32",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "Bs2ZP6M0uAnemGxlkqE490o12Nk=",
+			"path": "gonum.org/v1/gonum/internal/asm/f64",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "jXY/JvFsbCRu87qh4VnyEMI89yc=",
+			"path": "gonum.org/v1/gonum/internal/math32",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "+JhF/vxlLN2i2VspTfNAwlm7Dvw=",
+			"path": "gonum.org/v1/gonum/lapack",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "cO8oUK3M3CgZsUWbl8qoSYLFpd8=",
+			"path": "gonum.org/v1/gonum/lapack/gonum",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "c04H+XilnwfQj8RWdscBBJczv2o=",
+			"path": "gonum.org/v1/gonum/lapack/lapack64",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "N/NrWPBHI3U45D7xB1/1Dv/qu5g=",
+			"path": "gonum.org/v1/gonum/mat",
+			"revision": "e558b37b29a7e86c64a6c22a2fa3b6734b06da7f",
+			"revisionTime": "2018-02-25T03:27:12Z"
+		},
+		{
+			"checksumSHA1": "X8kQRvgolG/Km4KtW38tv1jWHbY=",
+			"path": "gonum.org/v1/plot",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "YAGZ2DKiIMpOMH6zYIX1w6F5zY8=",
+			"path": "gonum.org/v1/plot/palette",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "iI0n0DNcg8SRwwQ6sN4dOwtJTGM=",
+			"path": "gonum.org/v1/plot/plotter",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "q0l/s6Y7GkmUuRlmTEa/boBWqWM=",
+			"path": "gonum.org/v1/plot/plotutil",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "DPO/od9IBO/HScxWPh3s4a8CCEU=",
+			"path": "gonum.org/v1/plot/tools/bezier",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "eu36V6ZHl1NEUSI5EJ+7rUZV2ng=",
+			"path": "gonum.org/v1/plot/vg",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "0nDyaUuRGCfw8VOmBpeyDXk5LxM=",
+			"path": "gonum.org/v1/plot/vg/draw",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "wb+hRdFZX59nRHoEy4CNnABvxzk=",
+			"path": "gonum.org/v1/plot/vg/fonts",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "Sau48AYYHwcy9mam2gW2HjNLM8o=",
+			"path": "gonum.org/v1/plot/vg/vgeps",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "xO/TOHkLmhXNMgYx9y4W4SHWCbI=",
+			"path": "gonum.org/v1/plot/vg/vgimg",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "A981NY0Ninovst8/Bd4+97Y3OIs=",
+			"path": "gonum.org/v1/plot/vg/vgpdf",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		},
+		{
+			"checksumSHA1": "jfWRckEehQjQOz7DLqtX7cb6KMI=",
+			"path": "gonum.org/v1/plot/vg/vgsvg",
+			"revision": "c80b4af80826e511ee21065999c947d47b4fada2",
+			"revisionTime": "2020-01-14T03:11:01Z"
+		}
+	],
+	"rootPath": "github.com/hooto/hchart"
+}
