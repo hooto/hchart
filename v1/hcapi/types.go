@@ -28,7 +28,6 @@ const (
 	ChartTypeBarHorizontal = "bar-h"
 	ChartTypeLine          = "line"
 	ChartTypePie           = "pie"
-	ChartTypeHistogram     = "histogram"
 )
 
 type ChartEntry struct {
@@ -38,28 +37,9 @@ type ChartEntry struct {
 }
 
 type ChartOptions struct {
-	Title  string      `json:"title,omitempty"`
-	Width  string      `json:"width,omitempty"`
-	Height string      `json:"height,omitempty"`
-	X      AxisOptions `json:"x,omitempty"`
-	Y      AxisOptions `json:"y,omitempty"`
-}
-
-type AxisOptions struct {
-	Title string `json:"title,omitempty"`
-}
-
-func (it *ChartOptions) WidthLength() float64 {
-	return 800
-}
-
-func (it *ChartOptions) HeightLength() float64 {
-	return 400
-}
-
-type ChartPoint struct {
-	X float64 `json:"x,omitempty"`
-	Y float64 `json:"y,omitempty"`
+	Title  string `json:"title,omitempty"`
+	Width  string `json:"width,omitempty"`
+	Height string `json:"height,omitempty"`
 }
 
 type ChartData struct {
@@ -68,10 +48,8 @@ type ChartData struct {
 }
 
 type ChartDataset struct {
-	Label  string        `json:"label,omitempty"`
-	Data   []int64       `json:"data,omitempty"`
-	Points []*ChartPoint `json:"points,omitempty"`
-	Values []float64     `json:"values,omitempty"`
+	Label string  `json:"label,omitempty"`
+	Data  []int64 `json:"data,omitempty"`
 }
 
 func (it *ChartEntry) Valid() error {
@@ -100,46 +78,6 @@ func (it *ChartData) Sync(legendLabel, dsLabel string, dsData int64) {
 	if len(it.Labels) < 1 {
 		it.Labels = append(it.Labels, legendLabel)
 	}
-}
-
-func (it *ChartEntry) Dataset(legendLabel string) *ChartDataset {
-
-	datasetMu.Lock()
-	defer datasetMu.Unlock()
-
-	for _, v := range it.Data.Datasets {
-
-		if v.Label == legendLabel {
-			v.Values = []float64{}
-			v.Points = []*ChartPoint{}
-			return v
-		}
-	}
-	v := &ChartDataset{
-		Label: legendLabel,
-	}
-	it.Data.Datasets = append(it.Data.Datasets, v)
-	return v
-}
-
-func (it *ChartDataset) PointSet(x, y float64) {
-	it.Point(x).Y = y
-}
-
-func (it *ChartDataset) Point(x float64) *ChartPoint {
-
-	for _, v := range it.Points {
-		if v.X == x {
-			return v
-		}
-	}
-
-	p := &ChartPoint{
-		X: x,
-	}
-
-	it.Points = append(it.Points, p)
-	return p
 }
 
 type ChartList struct {
@@ -173,8 +111,4 @@ func (it *ChartList) Sync(c_type, c_title, legendLabel, dsLabel string, dsData i
 			},
 		},
 	})
-}
-
-type ChartRenderOptions struct {
-	Name string `json:"name"`
 }

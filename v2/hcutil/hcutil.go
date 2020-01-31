@@ -16,14 +16,15 @@ package hcutil
 
 import (
 	"errors"
+	"fmt"
 	"image/color"
-
-	"github.com/hooto/hchart/hcapi"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
+
+	hcapi "github.com/hooto/hchart/v2/hcapi"
 )
 
 var (
@@ -58,7 +59,7 @@ func ColorGray(n int) color.RGBA {
 	return colorGrays[n%len(colorGrays)]
 }
 
-func Render(item *hcapi.ChartEntry, opts *hcapi.ChartRenderOptions) error {
+func Render(item *hcapi.ChartItem, opts *hcapi.ChartRenderOptions) error {
 
 	if err := item.Valid(); err != nil {
 		return err
@@ -83,16 +84,27 @@ func Render(item *hcapi.ChartEntry, opts *hcapi.ChartRenderOptions) error {
 		return errors.New("invalid type")
 	}
 
-	if err := p.Save(
-		vg.Length(item.Options.WidthLength()),
-		vg.Length(item.Options.HeightLength()), opts.Name+".png"); err != nil {
-		return err
+	exts := []string{}
+	if opts.SvgEnable {
+		exts = append(exts, "svg")
+	}
+	if opts.PngEnable {
+		exts = append(exts, "png")
+	}
+
+	for _, ext := range exts {
+		if err := p.Save(
+			vg.Length(item.Options.WidthLength()),
+			vg.Length(item.Options.HeightLength()),
+			fmt.Sprintf("%s.%s", opts.Name, ext)); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func lineRender(p *plot.Plot, item *hcapi.ChartEntry) error {
+func lineRender(p *plot.Plot, item *hcapi.ChartItem) error {
 
 	{
 		p.X.Label.Text = item.Options.X.Title
@@ -126,7 +138,7 @@ func lineRender(p *plot.Plot, item *hcapi.ChartEntry) error {
 	}
 	*/
 
-	for k, v := range item.Data.Datasets {
+	for k, v := range item.Datasets {
 
 		var data plotter.XYs
 		for _, v2 := range v.Points {
@@ -138,11 +150,16 @@ func lineRender(p *plot.Plot, item *hcapi.ChartEntry) error {
 		l.Color = ColorTheme(k)
 		l.Width = 2
 
-		s.Color = ColorTheme(k)
-		s.Shape = plotutil.Shape(k)
+		if len(data) < 50 {
+			s.Color = ColorTheme(k)
+			s.Shape = plotutil.Shape(k)
 
-		p.Add(l, s)
-		p.Legend.Add(v.Label, l, s)
+			p.Add(l, s)
+			p.Legend.Add(v.Name, l, s)
+		} else {
+			p.Add(l)
+			p.Legend.Add(v.Name, l)
+		}
 	}
 
 	{
@@ -159,30 +176,32 @@ func lineRender(p *plot.Plot, item *hcapi.ChartEntry) error {
 	return nil
 }
 
-func barRender(p *plot.Plot, item *hcapi.ChartEntry) error {
+func barRender(p *plot.Plot, item *hcapi.ChartItem) error {
 
-	legendN := len(item.Data.Labels)
+	legendN := len(item.Labels)
 
 	if legendN == 0 ||
-		len(item.Data.Datasets) < 1 ||
-		legendN != len(item.Data.Datasets[0].Values) {
+		len(item.Datasets) < 1 ||
+		legendN != len(item.Datasets[0].Points) {
 		return errors.New("invalid datasets")
 	}
 
 	labels := []string{}
-	for _, v := range item.Data.Labels {
+	for _, v := range item.Labels {
 		labels = append(labels, v)
 	}
 	p.NominalX(labels...)
 
 	w := vg.Length(15)
 	wMax := vg.Length(item.Options.WidthLength())
-	wMax /= vg.Length(len(labels) * (len(item.Data.Datasets) + 1))
+	wMax /= vg.Length(len(labels) * (len(item.Datasets) + 1))
 	if wMax < w {
 		w = wMax
 		if w < 1 {
 			w = 1
 		}
+	} else if (w * 3) < wMax {
+		w = wMax / 2
 	}
 
 	if item.Options.X.Title != "" {
@@ -194,14 +213,14 @@ func barRender(p *plot.Plot, item *hcapi.ChartEntry) error {
 	}
 
 	offsetK := vg.Length(0)
-	if n := len(item.Data.Datasets); n > 1 {
+	if n := len(item.Datasets); n > 1 {
 		offsetK = (w * vg.Length(n)) / -2
 		offsetK += w / 2
 	}
 
-	for k, v := range item.Data.Datasets {
+	for k, v := range item.Datasets {
 
-		data := plotter.Values(v.Values)
+		data := plotter.Values(v.PointYs())
 
 		bcPlot, err := plotter.NewBarChart(data, w)
 		if err != nil {
@@ -212,7 +231,7 @@ func barRender(p *plot.Plot, item *hcapi.ChartEntry) error {
 		bcPlot.Offset = offsetK + (vg.Length(k) * w)
 
 		p.Add(bcPlot)
-		p.Legend.Add(v.Label, bcPlot)
+		p.Legend.Add(v.Name, bcPlot)
 	}
 
 	{
@@ -227,15 +246,15 @@ func barRender(p *plot.Plot, item *hcapi.ChartEntry) error {
 	return nil
 }
 
-func histRender(p *plot.Plot, item *hcapi.ChartEntry) error {
+func histRender(p *plot.Plot, item *hcapi.ChartItem) error {
 
-	if len(item.Data.Datasets) < 1 || len(item.Data.Datasets[0].Values) < 1 {
+	if len(item.Datasets) < 1 || len(item.Datasets[0].Points) < 1 {
 		return errors.New("invalid datasets")
 	}
 
-	for k, v := range item.Data.Datasets {
+	for k, v := range item.Datasets {
 
-		data := plotter.Values(v.Values)
+		data := plotter.Values(v.PointXs())
 
 		hPlot, err := plotter.NewHist(data, 100)
 		if err != nil {
@@ -259,28 +278,3 @@ func histRender(p *plot.Plot, item *hcapi.ChartEntry) error {
 
 	return nil
 }
-
-/*
-func dumpPng(name string, item hcapi.ChartEntry, c chart.Chart) error {
-
-	fp, err := os.OpenFile(name+".png", os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil {
-		return err
-	}
-	defer fp.Close()
-
-	fp.Seek(0, 0)
-	fp.Truncate(0)
-
-	img := image.NewRGBA(image.Rect(0, 0, 800, 400))
-	bg := image.NewUniform(color.RGBA{0xff, 0xff, 0xff, 0xff})
-	draw.Draw(img, img.Bounds(), bg, image.ZP, draw.Src)
-
-	igr := imgg.AddTo(img, 0, 0, 800, 400, color.RGBA{0xff, 0xff, 0xff, 0xff}, nil, nil)
-	c.Plot(igr)
-
-	png.Encode(fp, img)
-
-	return nil
-}
-*/
