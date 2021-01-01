@@ -20,6 +20,11 @@ const (
 	ChartTypeHistogram = "histogram"
 )
 
+var (
+	chatOptionWidthDefault  float64 = 800
+	chatOptionHeightDefault float64 = 400
+)
+
 type ChartItem struct {
 	Type     string       `json:"type"`
 	Options  ChartOptions `json:"options"`
@@ -33,8 +38,8 @@ func (it *ChartItem) Valid() error {
 
 type ChartOptions struct {
 	Title  string      `json:"title,omitempty"`
-	Width  string      `json:"width,omitempty"`
-	Height string      `json:"height,omitempty"`
+	Width  float64     `json:"width,omitempty"`
+	Height float64     `json:"height,omitempty"`
 	X      AxisOptions `json:"x,omitempty"`
 	Y      AxisOptions `json:"y,omitempty"`
 }
@@ -44,11 +49,25 @@ type AxisOptions struct {
 }
 
 func (it *ChartOptions) WidthLength() float64 {
-	return 800
+	if it.Width <= 0 {
+		it.Width = chatOptionWidthDefault
+	} else if it.Width < 100 {
+		it.Width = 100
+	} else if it.Width > 4000 {
+		it.Width = 4000
+	}
+	return it.Width
 }
 
 func (it *ChartOptions) HeightLength() float64 {
-	return 400
+	if it.Height <= 0 {
+		it.Height = chatOptionHeightDefault
+	} else if it.Height < 100 {
+		it.Height = 100
+	} else if it.Height > 4000 {
+		it.Height = 4000
+	}
+	return it.Height
 }
 
 type ChartRenderOptions struct {

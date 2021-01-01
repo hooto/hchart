@@ -12,25 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function(global, undefined) {
-    'use strict';
+(function (global, undefined) {
+    "use strict";
 
     if (global.hooto_chart) {
         return;
     }
 
-    var hc = global.hooto_chart = {
-        version: "0.1.0.dev",
+    var hc = (global.hooto_chart = {
+        version: "0.1.1",
         basepath: "/hchart/~",
         opts_width: "800px",
         opts_height: "600px",
-    }
+        instances: {},
+    });
 
     var color = {
         theme: null,
         theme_tb: ["337ab7", "5cb85c", "5bc0de", "f0ad4e", "d9534f", "333333"],
         theme_gc: ["0057e7", "d62d20", "ffa700", "008744", "9c27b0", "333333"],
-    }
+    };
 
     function color_pallet(theme) {
         if (!theme) {
@@ -39,7 +40,7 @@
         this.randlast = 0;
         this.reset = 1;
 
-        this.rand = function() {
+        this.rand = function () {
             this.randlast++;
             if (this.randlast > this.theme.length) {
                 this.randlast = 1;
@@ -53,43 +54,116 @@
                 r = r + parseInt((255 - r) * (1 - this.reset));
                 g = g + parseInt((255 - g) * (1 - this.reset));
                 b = b + parseInt((255 - b) * (1 - this.reset));
-                color_i16 = ((1 << 24) + (r << 16) + (g << 8) + b);
+                color_i16 = (1 << 24) + (r << 16) + (g << 8) + b;
             }
             return color_i16;
-        }
+        };
     }
 
-    color.rgb = function(color_i16, alpha) {
+    color.rgb = function (color_i16, alpha) {
         var r = (color_i16 >> 16) & 255;
         var g = (color_i16 >> 8) & 255;
         var b = color_i16 & 255;
 
         return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
-    }
+    };
 
-    hc.deps_load = function(cb) {
-        seajs.use([
-            hc.basepath + "/chartjs/chart.js",
-        ], cb);
-    }
+    hc.deps_load = function (cb) {
+        seajs.use([hc.basepath + "/chartjs/chart.js"], cb);
+    };
 
-    hc.JsonRenderElementID = function(elem_id) {
+    hc.JsonRenderElementID = function (elem_id) {
         var elem = document.getElementById(elem_id);
         if (!elem) {
             return;
         }
         hc.JsonRenderElement(elem, elem_id);
-    }
+    };
 
-    hc.JsonRenderElement = function(elem, elem_id) {
+    hc.JsonRenderElement = function (elem, elem_id) {
         var entry = JSON.parse(elem.innerHTML);
         if (!entry) {
             return;
         }
         return hc.RenderElement(entry, elem_id);
-    }
+    };
 
-    hc.RenderElement = function(entry, elem_id) {
+    hc._utilxArrayObjectHas = function (ar, v) {
+        for (var i in ar) {
+            if (ar[i] == v) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    hc.RenderUpdate = function (entry, elem_id) {
+        if (entry.data.labels.length < 1) {
+            return;
+        }
+
+        for (var i in entry.data.datasets) {
+            if (entry.data.labels.length != entry.data.datasets[i].data.length) {
+                return;
+            }
+        }
+
+        var chart = hc.instances[elem_id];
+
+        if (!chart) {
+            return;
+        }
+
+        var plen = chart.data.labels.length;
+
+        var offset = plen;
+        for (var i in chart.data.labels) {
+            if (chart.data.labels[i] == entry.data.labels[0]) {
+                offset = i;
+                break;
+            }
+        }
+
+        if (offset < plen) {
+            chart.data.labels.splice(offset);
+            for (var i in chart.data.datasets) {
+                chart.data.datasets[i].data.splice(offset);
+            }
+        }
+
+        chart.data.labels = chart.data.labels.concat(entry.data.labels);
+
+        for (var j in chart.data.datasets) {
+            for (var k in entry.data.datasets) {
+                if (
+                    !entry.data.datasets[k].label ||
+                    entry.data.datasets[k].label != chart.data.datasets[j].label
+                ) {
+                    continue;
+                }
+
+                chart.data.datasets[j].data = chart.data.datasets[j].data.concat(
+                    entry.data.datasets[k].data
+                );
+
+                break;
+            }
+        }
+        chart.update(200);
+
+        setTimeout(function () {
+            if (chart.data.labels.length > plen) {
+                for (var j in chart.data.datasets) {
+                    chart.data.datasets[j].data.splice(0, chart.data.labels.length - plen);
+                }
+
+                chart.data.labels.splice(0, chart.data.labels.length - plen);
+            }
+            chart.update(200);
+        }, 300);
+    };
+
+    hc.RenderElement = function (entry, elem_id) {
         if (!entry || !entry.type) {
             return;
         }
@@ -103,12 +177,12 @@
         entry.options.scales = entry.options.scales || {};
         entry.options.elements = entry.options.elements || {};
 
-        if (entry.options.title && typeof entry.options.title === 'string') {
+        if (entry.options.title && typeof entry.options.title === "string") {
             entry.options.title = {
                 text: entry.options.title,
                 display: true,
-                fontSize: 16
-            }
+                fontSize: 16,
+            };
         }
 
         if (entry.options.legend.display === undefined) {
@@ -136,12 +210,16 @@
 
         entry.options.elements.line = {};
 
-        entry.options.scales.xAxes = [{
-            // position: 'top', 
-        }];
-        entry.options.scales.yAxes = [{
-            // stacked: true,
-        }];
+        entry.options.scales.xAxes = [
+            {
+                // position: 'top',
+            },
+        ];
+        entry.options.scales.yAxes = [
+            {
+                // stacked: true,
+            },
+        ];
 
         for (var i in entry.data.datasets) {
             entry.data.datasets[i] = {
@@ -165,9 +243,9 @@
                 hc.jsr_pie(entry);
                 break;
         }
-    }
+    };
 
-    hc.jsr_line = function(entry) {
+    hc.jsr_line = function (entry) {
         entry.options.scales.xAxes[0].gridLines = {
             display: false,
         };
@@ -184,9 +262,9 @@
             entry.options.legend.position = "bottom";
         }
         hc.jsr_general(entry);
-    }
+    };
 
-    hc.jsr_bar = function(entry) {
+    hc.jsr_bar = function (entry) {
         if (entry.type == "bar") {
             entry.options.scales.xAxes[0].gridLines = {
                 display: false,
@@ -218,9 +296,9 @@
         }
 
         hc.jsr_general(entry);
-    }
+    };
 
-    hc.jsr_pie = function(entry) {
+    hc.jsr_pie = function (entry) {
         entry.options.scales.xAxes = {};
         entry.options.scales.yAxes = {};
         entry.options.cutoutPercentage = 50;
@@ -239,12 +317,11 @@
             entry.data.datasets[i].backgroundColor = cs;
         }
         hc.jsr_general(entry);
-    }
+    };
 
-    hc.jsr_general = function(data) {
-        hc.deps_load(function() {
-
-		    // Chart.defaults.global.title.fontSize = 16;
+    hc.jsr_general = function (data) {
+        hc.deps_load(function () {
+            // Chart.defaults.global.title.fontSize = 16;
             var elem_c = document.createElement("canvas");
             elem_c.id = data.elem_id + "-hchart";
             if (data.options.width) {
@@ -275,8 +352,8 @@
             }
 
             var ctx = document.getElementById(data.elem_id + "-hchart").getContext("2d");
-            new Chart(ctx, data);
+            var instance = new Chart(ctx, data);
+            hc.instances[data.elem_id] = instance;
         });
-    }
-
+    };
 })(this);
