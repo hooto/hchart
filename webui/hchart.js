@@ -174,18 +174,26 @@
 
         entry.options = entry.options || {};
         entry.options.legend = entry.options.legend || {};
+
         entry.options.scales = entry.options.scales || {};
+        entry.options.scales.x = entry.options.scales.x || {};
+        entry.options.scales.y = entry.options.scales.y || {};
+
         entry.options.elements = entry.options.elements || {};
 
+        entry.options.plugins = entry.options.plugins || {};
+        entry.options.plugins.legend = entry.options.plugins.legend || {};
+
+
         if (entry.options.title && typeof entry.options.title === "string") {
-            entry.options.title = {
+            entry.options.plugins.title = {
                 text: entry.options.title,
                 display: true,
                 fontSize: 16,
             };
         }
 
-        if (entry.options.legend.display === undefined) {
+        if (!entry.options.legend.display) {
             entry.options.legend.display = true;
         } else {
             entry.options.legend.display = false;
@@ -199,7 +207,10 @@
         }
 
         entry.options.animation = {
-            duration: 0,
+            tension: {
+                duration: 0,
+                easing: 'linear',
+            },
         };
 
         entry.options.hover = {
@@ -210,22 +221,12 @@
 
         entry.options.elements.line = {};
 
-        entry.options.scales.xAxes = [
-            {
-                // position: 'top',
-            },
-        ];
-        entry.options.scales.yAxes = [
-            {
-                // stacked: true,
-            },
-        ];
-
         for (var i in entry.data.datasets) {
             entry.data.datasets[i] = {
-                borderWidth: 0,
+                // borderWidth: 0,
                 label: entry.data.datasets[i].label,
                 data: entry.data.datasets[i].data,
+                tension: 0.1,
             };
         }
 
@@ -246,9 +247,9 @@
     };
 
     hc.jsr_line = function (entry) {
-        entry.options.scales.xAxes[0].gridLines = {
+        entry.options.scales.x.grid = {
             display: false,
-        };
+        }
         var cp = new color_pallet();
         for (var i in entry.data.datasets) {
             var clr = cp.rand();
@@ -258,20 +259,21 @@
         }
         if (entry.data.datasets.length == 1 && entry.options.title) {
             entry.options.legend.display = false;
-        } else if (entry.options.legend.position === undefined) {
-            entry.options.legend.position = "bottom";
+        }
+        if (!entry.options.plugins.legend.position) {
+            entry.options.plugins.legend.position = "bottom";
         }
         hc.jsr_general(entry);
     };
 
     hc.jsr_bar = function (entry) {
         if (entry.type == "bar") {
-            entry.options.scales.xAxes[0].gridLines = {
+            entry.options.scales.x.grid = {
                 display: false,
             };
         }
         if (entry.type == "bar-h") {
-            entry.options.scales.yAxes[0].gridLines = {
+            entry.options.scales.y.grid = {
                 display: false,
             };
             entry.type = "horizontalBar";
@@ -279,7 +281,7 @@
 
         if (entry.data.datasets.length == 1 && entry.options.title) {
             entry.options.legend.display = false;
-        } else if (entry.options.legend.position === undefined) {
+        } else if (!entry.options.legend.position) {
             entry.options.legend.position = "bottom";
         }
 
@@ -299,11 +301,11 @@
     };
 
     hc.jsr_pie = function (entry) {
-        entry.options.scales.xAxes = {};
-        entry.options.scales.yAxes = {};
+        entry.options.scales.x = {};
+        entry.options.scales.y = {};
         entry.options.cutoutPercentage = 50;
 
-        if (entry.options.legend.position === undefined) {
+        if (!entry.options.legend.position) {
             entry.options.legend.position = "right";
         }
 
