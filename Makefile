@@ -13,7 +13,12 @@ bindata_build:
 	# go get -d github.com/hooto/httpsrv-bindata
 	# go install github.com/hooto/httpsrv-bindata
 	# $(BINDATA_CMD) $(BINDATA_ARGS_WEBUI)
-	statik -src webui/ -dest pkg/ -p webui -ns webui -f -include=hchart.js,chartjs/chart.js,sea.min.js
+	mkdir -p ./.build_temp/webui/chartjs
+	cp -rp webui/hchart.js .build_temp/webui/
+	cp -rp webui/sea.min.js .build_temp/webui/
+	cp -rp webui/chartjs/chart.js .build_temp/webui/chartjs\/chart.js
+	statik -src .build_temp/webui/ -dest pkg/ -p webui -ns webui -f
+	rm -fr .build_temp
 
 bindata_clean:
 	rm -f pkg/webui/statik.go
